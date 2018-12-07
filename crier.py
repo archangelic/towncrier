@@ -20,9 +20,8 @@ def get_emojos():
 @bot.event
 async def on_ready():
     print(bot.user.name)
-    print([i.name for i in bot.get_all_emojis()])
 
-@bot.command()
+#@bot.command()
 async def roll(*, message):
     print(dir(message))
     matches = dicepattern.match(message)
@@ -90,6 +89,27 @@ async def sleep(ctx):
         await bot.logout()
     else:
         await bot.say("I can't let you do that {}".format(author.mention))
+
+@bot.command(pass_context=True)
+async def pronouns(ctx, role):
+    if ctx.message.server:
+        server = ctx.message.server
+    else:
+        return None
+    pronouns = [
+        'he/him',
+        'she/her',
+        'xey/xem',
+        'they/them'
+    ]
+    roles = {str(i).lower(): i for i in server.roles if str(i).lower() in pronouns}
+    if role.lower() in roles:
+        await bot.add_roles(ctx.message.author, roles[role.lower()])
+        em = discord.Embed(
+            description='pronouns {} set for {}'.format(roles[role.lower()], ctx.message.author.mention),
+            color=0xE0B0FF
+        )
+        await bot.send_message(ctx.message.channel, embed=em)
 
 with open('discord.secret') as d:
     token = d.read().strip()
